@@ -23,7 +23,6 @@ import com.loktra.tvmaze.communicator.ShowsAdapterListener;
 import com.loktra.tvmaze.constants.AppConstants;
 import com.loktra.tvmaze.databinding.ActivityMainBinding;
 import com.loktra.tvmaze.models.Show;
-import com.loktra.tvmaze.models.TvShow;
 import com.loktra.tvmaze.utils.GridSpacingItemDecoration;
 import com.loktra.tvmaze.viewmodel.TvshowListViewModel;
 
@@ -43,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements ShowsAdapterListe
     private RecyclerView recyclerView;
     private TvShowAdapter mAdapter;
     private ActivityMainBinding binding;
-    private TvShow show;
+    private TvshowListViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +53,8 @@ public class MainActivity extends AppCompatActivity implements ShowsAdapterListe
 
         initRecyclerView();
 
-        //  Asynchronous OkHttp Calls
-        //okhttpCall();
-
-        final TvshowListViewModel viewModel = ViewModelProviders.of(this).get(TvshowListViewModel.class);
-        observeViewModel(viewModel);
+        viewModel = ViewModelProviders.of(this).get(TvshowListViewModel.class);
+        observeViewModel();
     }
 
     /**
@@ -78,22 +74,23 @@ public class MainActivity extends AppCompatActivity implements ShowsAdapterListe
 
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setNestedScrollingEnabled(false);
-        mAdapter = new TvShowAdapter(getshowes(), this);
+        mAdapter = new TvShowAdapter(new ArrayList<Show>(), this);
         recyclerView.setAdapter(mAdapter);
     }
 
-    private void observeViewModel(TvshowListViewModel viewModel) {
+    private void observeViewModel() {
         // Update the list when the data changes
 
-        viewModel.getShowListLiveData().observe(this, new Observer<ArrayList<Show>>() {
-            @Override
-            public void onChanged(@Nullable ArrayList<Show> shows) {
+        if (viewModel != null)
+            viewModel.getShowListLiveData().observe(this, new Observer<ArrayList<Show>>() {
+                @Override
+                public void onChanged(@Nullable ArrayList<Show> shows) {
 
-                if (shows != null) {
-                    mAdapter.setTvshowList(shows);
+                    if (shows != null) {
+                        mAdapter.setTvshowList(shows);
+                    }
                 }
-            }
-        });
+            });
     }
 
     private ArrayList<Show> getshowes() {

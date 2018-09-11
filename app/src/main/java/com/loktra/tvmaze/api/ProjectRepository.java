@@ -29,7 +29,7 @@ public class ProjectRepository {
         client = new OkHttpClient();
 
         request = new Request.Builder()
-                .url(AppConstants.API_URL)
+                .url(AppConstants.BASE_URL.concat(AppConstants.SHOW_URL))
                 .build();
 
     }
@@ -55,13 +55,13 @@ public class ProjectRepository {
                 e.printStackTrace();
                 call.cancel();
             }
-            
+
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
 
                 // Set 10 millisec delay
-                simulateDelay();
+                //simulateDelay();
 
                 final String myResponse = response.body().string();
 

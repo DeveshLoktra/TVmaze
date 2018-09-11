@@ -14,40 +14,32 @@ import com.loktra.tvmaze.models.Show;
 
 import java.util.ArrayList;
 
-public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.MyViewHolder> {
+public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.TvShowViewHolder> {
 
     private ArrayList<Show> showList;
     private LayoutInflater layoutInflater;
     private ShowsAdapterListener listener;
-
-    public TvShowAdapter(ShowsAdapterListener listener) {
-        this.listener = listener;
-    }
 
     public TvShowAdapter(ArrayList<Show> showList, ShowsAdapterListener listener) {
         this.showList = showList;
         this.listener = listener;
     }
 
-    public void setTvshowList(ArrayList<Show> showList) {
-        this.showList = showList;
-        notifyDataSetChanged();
-    }
-
     @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TvShowViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         if (layoutInflater == null)
             layoutInflater = LayoutInflater.from(parent.getContext());
 
         TvshowItemViewBinding binding = DataBindingUtil.inflate(layoutInflater, R.layout.tvshow_item_view, parent, false);
 
-        return new MyViewHolder(binding);
-    }
+        return new TvShowViewHolder(binding);
+    }  // End of onCreateViewHolder()
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull TvShowViewHolder holder, final int position) {
+
         holder.binding.setShow(showList.get(position));
 
         holder.binding.ivTvShow.setOnClickListener(new View.OnClickListener() {
@@ -59,23 +51,26 @@ public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.MyViewHold
 
             }
         });
-    }
+    }  // En dof onBindViewHolder()
 
     @Override
     public int getItemCount() {
         return showList.size();
     }
 
+    public void setTvshowList(ArrayList<Show> showList) {
+        this.showList = showList;
+        notifyDataSetChanged();
+    }// End of setTvshowList()
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class TvShowViewHolder extends RecyclerView.ViewHolder {
 
         private TvshowItemViewBinding binding;
 
-        public MyViewHolder(final TvshowItemViewBinding binding) {
+        public TvShowViewHolder(final TvshowItemViewBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
-    }
-
+    } // End of class TvShowViewHolder
 
 }

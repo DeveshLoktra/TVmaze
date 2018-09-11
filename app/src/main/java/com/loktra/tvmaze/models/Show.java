@@ -1,5 +1,8 @@
 package com.loktra.tvmaze.models;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.widget.ImageView;
@@ -9,20 +12,33 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.loktra.tvmaze.R;
+import com.loktra.tvmaze.db.ImageConverter;
+import com.loktra.tvmaze.db.RatingConverter;
 
+@Entity
 public class Show {
+
+    @PrimaryKey(autoGenerate = false)
+    @SerializedName("id")
+    @Expose
+    public String id;
 
     @SerializedName("name")
     @Expose
     public String name;
 
+    //@Ignore  // ignore this field during Room persistance
+    @TypeConverters(RatingConverter.class)
     @SerializedName("rating")
     @Expose
     public Rating rating;
 
+    //@Ignore // ignore the field during Room persistance
+    @TypeConverters(ImageConverter.class)
     @SerializedName("image")
     @Expose
     public Image image;
+
 
     public Show(String name, Rating rating, Image image) {
         this.name = name;
@@ -42,6 +58,14 @@ public class Show {
                 .setDefaultRequestOptions(options)
                 .load(imageUrl)
                 .into(view);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
