@@ -19,6 +19,11 @@ allprojects {
     repositories {
         google()
         jcenter()
+
+        // for MVVM
+        maven {
+            url "https://maven.google.com"
+        }
     }
 }
 
