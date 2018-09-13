@@ -8,7 +8,7 @@ import android.arch.persistence.room.TypeConverters;
 
 import com.loktra.tvmaze.models.Show;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -20,13 +20,13 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 public interface ShowModelDao {
 
     @Query("Select * from Show")
-    LiveData<ArrayList<Show>> getAllShowList();
+    LiveData<List<Show>> getAllShowList();
 
     @Insert(onConflict = REPLACE)
     void addTvShow(Show show);
 
     @Insert(onConflict = REPLACE)
-    void addTvShows(LiveData<ArrayList<Show>> shows);
+    void addTvShows(List<Show> shows);
 
 
 }

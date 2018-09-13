@@ -10,12 +10,13 @@ import com.loktra.tvmaze.models.Show;
 @Database(entities = {Show.class}, version = 1)
 public abstract class ShowDatabase extends RoomDatabase {
 
+    private static final String DATABASE_NAME = "show_db";
     private static ShowDatabase INSTANCE;
 
     public static ShowDatabase getDatabase(Context context) {
         if (INSTANCE == null)
-            INSTANCE = Room.databaseBuilder(context.getApplicationContext(), ShowDatabase.class, "show_db")
-                    .fallbackToDestructiveMigration()
+            INSTANCE = Room.databaseBuilder(context.getApplicationContext(), ShowDatabase.class, DATABASE_NAME)
+                    //.fallbackToDestructiveMigration()
                     .build();
 
         return INSTANCE;
@@ -25,6 +26,6 @@ public abstract class ShowDatabase extends RoomDatabase {
         INSTANCE = null;
     }
 
-    public abstract ShowModelDao itemAndShowModel();
+    public abstract ShowModelDao daoAccess();
 
 }

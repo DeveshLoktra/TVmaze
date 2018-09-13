@@ -6,10 +6,11 @@ import android.arch.lifecycle.MutableLiveData;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.loktra.tvmaze.constants.AppConstants;
+import com.loktra.tvmaze.db.ShowDatabase;
 import com.loktra.tvmaze.models.Show;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -19,12 +20,13 @@ import okhttp3.Response;
 
 public class ProjectRepository {
 
-    private static ProjectRepository projectRepository;
     private final String TAG = getClass().getName();
+    private static ProjectRepository projectRepository;
     private OkHttpClient client;
     private Request request;
+    private ShowDatabase mDatabase;
 
-    public ProjectRepository() {
+    public ProjectRepository(ShowDatabase mDatabase) {
 
         client = new OkHttpClient();
 
@@ -32,19 +34,20 @@ public class ProjectRepository {
                 .url(AppConstants.BASE_URL.concat(AppConstants.SHOW_URL))
                 .build();
 
+        this.mDatabase = mDatabase;
     }
 
-    public synchronized static ProjectRepository getInstance() {
+    public synchronized static ProjectRepository getInstance(ShowDatabase mDatabase) {
 
         if (projectRepository == null)
-            projectRepository = new ProjectRepository();
+            projectRepository = new ProjectRepository(mDatabase);
 
         return projectRepository;
     }
 
 
-    public LiveData<ArrayList<Show>> getTvshowList() {
-        final MutableLiveData<ArrayList<Show>> data = new MutableLiveData<>();
+    public LiveData<List<Show>> getTvshowList() {
+        final MutableLiveData<List<Show>> data = new MutableLiveData<>();
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -65,8 +68,10 @@ public class ProjectRepository {
 
                 final String myResponse = response.body().string();
 
-                ArrayList<Show> alShow = new Gson().fromJson(myResponse, new TypeToken<ArrayList<Show>>() {
+                List<Show> alShow = new Gson().fromJson(myResponse, new TypeToken<List<Show>>() {
                 }.getType());
+
+                mDatabase.daoAccess().addTvShows(alShow);
 
                 data.postValue(alShow);
 

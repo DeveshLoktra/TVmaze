@@ -11,10 +11,11 @@ import com.loktra.tvmaze.db.ShowDatabase;
 import com.loktra.tvmaze.models.Show;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TvshowListViewModel extends AndroidViewModel {
 
-    private LiveData<ArrayList<Show>> showListLiveData;
+    private LiveData<List<Show>> showListLiveData;
     private ShowDatabase mDatabase;
 
     public TvshowListViewModel(@NonNull Application application) {
@@ -23,15 +24,15 @@ public class TvshowListViewModel extends AndroidViewModel {
         mDatabase = ShowDatabase.getDatabase(this.getApplication());
 
         // get data from Room
-        //showListLiveData = mDatabase.itemAndShowModel().getAllShowList();
+        showListLiveData = mDatabase.daoAccess().getAllShowList();
 
         // get data from TVmaze API
-        showListLiveData = ProjectRepository.getInstance().getTvshowList();
+        showListLiveData = ProjectRepository.getInstance(mDatabase).getTvshowList();
 
         //new UpdateDbAsynkTask(mDatabase).execute(showListLiveData);
     }
 
-    public LiveData<ArrayList<Show>> getShowListLiveData() {
+    public LiveData<List<Show>> getShowListLiveData() {
         return showListLiveData;
     }
 
@@ -46,7 +47,7 @@ public class TvshowListViewModel extends AndroidViewModel {
 
         @Override
         protected Void doInBackground(LiveData<ArrayList<Show>>... liveData) {
-            database.itemAndShowModel().addTvShows(liveData[0]);
+            //database.itemAndShowModel().addTvShows(liveData[0]);
             return null;
         }
     }

@@ -13,10 +13,11 @@ import com.loktra.tvmaze.databinding.TvshowItemViewBinding;
 import com.loktra.tvmaze.models.Show;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.TvShowViewHolder> {
 
-    private ArrayList<Show> showList;
+    private List<Show> showList;
     private LayoutInflater layoutInflater;
     private ShowsAdapterListener listener;
 
@@ -58,7 +59,7 @@ public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.TvShowView
         return showList.size();
     }
 
-    public void setTvshowList(ArrayList<Show> showList) {
+    public void setTvshowList(List<Show> showList) {
         this.showList = showList;
         notifyDataSetChanged();
     }// End of setTvshowList()

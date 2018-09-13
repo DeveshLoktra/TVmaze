@@ -1,10 +1,13 @@
 package com.loktra.tvmaze.models;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.databinding.BindingAdapter;
+import android.support.annotation.NonNull;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -18,6 +21,7 @@ import com.loktra.tvmaze.db.RatingConverter;
 @Entity
 public class Show {
 
+    @NonNull
     @PrimaryKey(autoGenerate = false)
     @SerializedName("id")
     @Expose
@@ -76,21 +80,39 @@ public class Show {
         this.name = name;
     }
 
+    @Entity(foreignKeys = {
+            @ForeignKey(
+                    entity = Show.class,
+                    parentColumns = "id",
+                    childColumns = "rating_fk"
+            )})
     public static class Rating {
         @SerializedName("average")
         @Expose
         public float average;
+
+        @ColumnInfo(name = "rating_fk")
+        private int ratingIdFk;
 
         public Rating(float average) {
             this.average = average;
         }
     }
 
+    @Entity(foreignKeys = {
+            @ForeignKey(
+                    entity = Show.class,
+                    parentColumns = "id",
+                    childColumns = "image_fk"
+            )})
     public static class Image {
 
         /*@SerializedName("medium")
         @Expose
         public String medium;*/
+
+        @ColumnInfo(name = "image_fk")
+        private int imageIdFk;
 
         @SerializedName("original")
         @Expose
