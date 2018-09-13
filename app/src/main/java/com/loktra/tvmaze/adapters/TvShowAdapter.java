@@ -52,7 +52,7 @@ public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.TvShowView
 
             }
         });
-    }  // En dof onBindViewHolder()
+    }  // End of onBindViewHolder()
 
     @Override
     public int getItemCount() {
