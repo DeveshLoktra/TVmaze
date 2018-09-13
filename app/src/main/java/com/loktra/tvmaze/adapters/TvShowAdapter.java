@@ -10,19 +10,17 @@ import android.view.ViewGroup;
 import com.loktra.tvmaze.R;
 import com.loktra.tvmaze.communicator.ShowsAdapterListener;
 import com.loktra.tvmaze.databinding.TvshowItemViewBinding;
-import com.loktra.tvmaze.models.Show;
+import com.loktra.tvmaze.repository.models.TvShow;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.TvShowViewHolder> {
 
-    private List<Show> showList;
+    private List<TvShow> showList;
     private LayoutInflater layoutInflater;
     private ShowsAdapterListener listener;
 
-    public TvShowAdapter(ArrayList<Show> showList, ShowsAdapterListener listener) {
-        this.showList = showList;
+    public TvShowAdapter(ShowsAdapterListener listener) {
         this.listener = listener;
     }
 
@@ -46,20 +44,18 @@ public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.TvShowView
         holder.binding.ivTvShow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if (listener != null)
                     listener.onTvShowClick(showList.get(position));
-
             }
         });
     }  // End of onBindViewHolder()
 
     @Override
     public int getItemCount() {
-        return showList.size();
+        return showList == null ? 0 : showList.size();
     }
 
-    public void setTvshowList(List<Show> showList) {
+    public void setTvshowList(List<TvShow> showList) {
         this.showList = showList;
         notifyDataSetChanged();
     }// End of setTvshowList()

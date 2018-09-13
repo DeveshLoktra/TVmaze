@@ -6,7 +6,7 @@
 
         <variable
             name="show"
-            type="com.loktra.tvmaze.models.Show" />
+            type="com.loktra.tvmaze.repository.models.TvShow" />
 
     </data>
 

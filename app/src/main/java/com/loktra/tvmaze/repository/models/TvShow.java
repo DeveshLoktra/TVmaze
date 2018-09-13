@@ -1,4 +1,4 @@
-package com.loktra.tvmaze.models;
+package com.loktra.tvmaze.repository.models;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
@@ -15,11 +15,11 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.loktra.tvmaze.R;
-import com.loktra.tvmaze.db.ImageConverter;
-import com.loktra.tvmaze.db.RatingConverter;
+import com.loktra.tvmaze.repository.database.converter.ImageConverter;
+import com.loktra.tvmaze.repository.database.converter.RatingConverter;
 
 @Entity
-public class Show {
+public class TvShow {
 
     @NonNull
     @PrimaryKey(autoGenerate = false)
@@ -44,7 +44,7 @@ public class Show {
     public Image image;
 
 
-    public Show(String name, Rating rating, Image image) {
+    public TvShow(String name, Rating rating, Image image) {
         this.name = name;
         this.rating = rating;
         this.image = image;
@@ -82,7 +82,7 @@ public class Show {
 
     @Entity(foreignKeys = {
             @ForeignKey(
-                    entity = Show.class,
+                    entity = TvShow.class,
                     parentColumns = "id",
                     childColumns = "rating_fk"
             )})
@@ -101,7 +101,7 @@ public class Show {
 
     @Entity(foreignKeys = {
             @ForeignKey(
-                    entity = Show.class,
+                    entity = TvShow.class,
                     parentColumns = "id",
                     childColumns = "image_fk"
             )})
@@ -111,15 +111,15 @@ public class Show {
         @Expose
         public String medium;*/
 
-        @ColumnInfo(name = "image_fk")
-        private int imageIdFk;
-
         @SerializedName("original")
         @Expose
         public String original;
+        @ColumnInfo(name = "image_fk")
+        private int imageIdFk;
 
         public Image(String original) {
             this.original = original;
         }
     }
 }
+

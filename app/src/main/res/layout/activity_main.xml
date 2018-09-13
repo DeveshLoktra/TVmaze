@@ -9,7 +9,7 @@
 
         <variable
             name="show"
-            type="com.loktra.tvmaze.models.TvShow" />
+            type="com.loktra.tvmaze.repository.models.TvShow" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -20,6 +20,16 @@
             android:id="@+id/content"
             bind:show="@{show}"
             layout="@layout/content_main" />
+
+        <ProgressBar
+            android:id="@+id/main_progressbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            bind:layout_constraintBottom_toBottomOf="parent"
+            bind:layout_constraintEnd_toEndOf="parent"
+            bind:layout_constraintStart_toStartOf="parent"
+            bind:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

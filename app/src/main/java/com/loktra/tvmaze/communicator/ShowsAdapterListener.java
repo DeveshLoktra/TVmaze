@@ -1,9 +1,9 @@
 package com.loktra.tvmaze.communicator;
 
-import com.loktra.tvmaze.models.Show;
+import com.loktra.tvmaze.repository.models.TvShow;
 
 public interface ShowsAdapterListener {
 
-    void onTvShowClick(Show show);
+    void onTvShowClick(TvShow show);
 
 }

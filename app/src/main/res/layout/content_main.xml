@@ -6,7 +6,7 @@
 
         <variable
             name="show"
-            type="com.loktra.tvmaze.models.TvShow" />
+            type="com.loktra.tvmaze.repository.models.TvShow" />
     </data>
 
     <android.support.constraint.ConstraintLayout
