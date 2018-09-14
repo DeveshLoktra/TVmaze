@@ -70,4 +70,5 @@ public class TvShowAdapter extends RecyclerView.Adapter<TvShowAdapter.TvShowView
         }
     } // End of class TvShowViewHolder
 
+
 }

@@ -2,7 +2,7 @@
     <string name="app_name">TVmaze</string>
 
     <string name="title_main_activity">TV Shows</string>
-
+    <string name="search_hint">Search</string>
     <string name="tvshow_title">TvShow Title or Name</string>
     <string name="tvshow_rating">4.9</string>
 </resources>

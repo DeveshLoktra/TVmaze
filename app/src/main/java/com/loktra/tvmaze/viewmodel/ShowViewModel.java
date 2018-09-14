@@ -24,35 +24,27 @@ public class ShowViewModel extends ViewModel {
     }
 
     // Fetching Data From Api
-    public LiveData<Resource<ArrayList<TvShow>>> fetchTVShowDataFromApi() {
+    public LiveData<Resource<ArrayList<TvShow>>> fetchFromApi() {
         return tvShowRepository.getServerTVShowResponse();
     }
 
     // Fetching Data From Room
-    public LiveData<List<TvShow>> fetchTVShowDataFromLocal() {
+    public LiveData<List<TvShow>> fetchFromLocalDb() {
         return tvShowRepository.getLocalTVShowResponse();
     }
 
-    // Both DB and API
+    // Fetching Data From Both Room DB and API
     public LiveData<List<TvShow>> fetch() {
         return tvShowRepository.getTvShowsMerged();
     }
 
-    // Saving Response From Api To Shared Preference and Setting Response To ResponseList
-    public void setResponse(List<TvShow> responseList, boolean saveResponse) {
-
-        if (saveResponse) {
-            tvShowRepository.saveTVShowResponse(responseList);
-        }
-
-        this.responseList = responseList;
+    // Searching shows by tag
+    public LiveData<List<TvShow>> search(String tag) {
+        return tvShowRepository.getSearchedShows(tag);
     }
 
-    public List<TvShow> getResponseList() {
-        return responseList;
-    }
-
-    public void setResponseList(ArrayList<TvShow> responseList) {
-        setResponse(responseList, false);
+    // Filtering shows by rating
+    public LiveData<List<TvShow>> filter(float start, float end) {
+        return tvShowRepository.getFilteredShow(start, end);
     }
 }
