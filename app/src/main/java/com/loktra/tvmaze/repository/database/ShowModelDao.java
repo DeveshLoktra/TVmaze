@@ -34,4 +34,7 @@ public interface ShowModelDao {
 
     @Query("SELECT * FROM TvShow WHERE rating BETWEEN :start AND :end")
     LiveData<List<TvShow>> getFilteredTvShows(float start, float end);
+
+    @Query("DELETE FROM TvShow")
+    void removeAll();
 }

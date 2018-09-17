@@ -5,4 +5,6 @@
     <string name="search_hint">Search</string>
     <string name="tvshow_title">TvShow Title or Name</string>
     <string name="tvshow_rating">4.9</string>
+    <string name="tvshow_info">Filter Applied: Rating 9.0 and above</string>
+
 </resources>

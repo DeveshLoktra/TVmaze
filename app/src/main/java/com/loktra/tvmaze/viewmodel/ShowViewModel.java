@@ -24,8 +24,8 @@ public class ShowViewModel extends ViewModel {
     }
 
     // Fetching Data From Api
-    public LiveData<Resource<ArrayList<TvShow>>> fetchFromApi() {
-        return tvShowRepository.getServerTVShowResponse();
+    public LiveData<Resource<ArrayList<TvShow>>> fetchFromApi(int page) {
+        return tvShowRepository.getServerTVShowResponse(page);
     }
 
     // Fetching Data From Room
@@ -34,8 +34,8 @@ public class ShowViewModel extends ViewModel {
     }
 
     // Fetching Data From Both Room DB and API
-    public LiveData<List<TvShow>> fetch() {
-        return tvShowRepository.getTvShowsMerged();
+    public LiveData<List<TvShow>> fetch(int page) {
+        return tvShowRepository.getTvShowsMerged(page);
     }
 
     // Searching shows by tag
@@ -46,5 +46,9 @@ public class ShowViewModel extends ViewModel {
     // Filtering shows by rating
     public LiveData<List<TvShow>> filter(float start, float end) {
         return tvShowRepository.getFilteredShow(start, end);
+    }
+
+    public void removeShow() {
+        tvShowRepository.removeAllShows();
     }
 }

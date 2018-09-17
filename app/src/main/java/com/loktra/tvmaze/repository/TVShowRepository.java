@@ -45,27 +45,11 @@ public class TVShowRepository {
         mAllTVShow = mTVShowDao.getAllShowList();
     }
 
-    // Getting Local Tv Show Data From Shared Preference
-   /* public LiveData<ArrayList<TVShowResponse>> getLocalTVShowResponse(){
-        Type type = new TypeToken<ArrayList<TVShowResponse>>(){}.getType();
-        String json = SharedPrefUtil.getStringFromPreferences(SharedPrefConstants.TVSHOW_RESPONSE);
-        ArrayList<TVShowResponse> tvShowResponse;
-        MutableLiveData<ArrayList<TVShowResponse>> tvShowResponseLD = new MutableLiveData<>();
-        if(json != null){
-            tvShowResponse = GsonHelper.getInstance().fromJson(json,type);
-            tvShowResponseLD.setValue(tvShowResponse);
-        }
-
-        Log.d(TAG,"Fetching Response From TVShow Local Database");
-
-        return tvShowResponseLD;
-    }*/
-
     // Fetching Tv Show Data From Api
-    public LiveData<Resource<ArrayList<TvShow>>> getServerTVShowResponse() {
+    public LiveData<Resource<ArrayList<TvShow>>> getServerTVShowResponse(int page) {
         Log.d(TAG, "Making TVShow APi Call");
 
-        Uri builtUri = Uri.parse(AppConstants.FETCH_TV_SHOW);
+        Uri builtUri = Uri.parse(AppConstants.FETCH_TV_SHOW_WIH_PAGES + page);
 
         Type type = new TypeToken<ArrayList<TvShow>>() {
         }.getType();
@@ -75,20 +59,9 @@ public class TVShowRepository {
 
     // Getting Local Tv Show Data From Shared Preference
     public LiveData<List<TvShow>> getLocalTVShowResponse() {
-
         Log.d(TAG, "Fetching Response From TVShow Local Database");
-        Log.d("datassssstt", "" + mAllTVShow.getValue() + " livedata : " + mAllTVShow);
         return mAllTVShow;
     }
-
-//    // Saving Data Fetched From Api To Shared Preference
-//    @WorkerThread
-//    public static void saveTVShowResponse(@NonNull ArrayList<TVShowResponse> tvShowResponseList) {
-//
-//        Type type = new TypeToken<ArrayList<TVShowResponse>>(){}.getType();
-//        SharedPrefUtil.saveStringToPreferences(SharedPrefConstants.TVSHOW_RESPONSE, GsonHelper.getInstance().toJson(tvShowResponseList, type));
-//        Log.d(TAG, "Saving Tv Show response to db");
-//    }
 
     /**
      * Saving Data Fetched From Api To Room Database
@@ -109,15 +82,13 @@ public class TVShowRepository {
 
         Log.d(TAG, "" + tvShowResponseList);
 
-        //new InsertAsynkTask(mTVShowDao).execute(tvShowResponseList);
-
         Log.d(TAG, "Saving Tv Show response to Room db");
     }
 
-    public LiveData<List<TvShow>> getTvShowsMerged() {
+    public LiveData<List<TvShow>> getTvShowsMerged(int page) {
 
         mergedData.removeSource(getLocalTVShowResponse());
-        mergedData.removeSource(getServerTVShowResponse());
+        mergedData.removeSource(getServerTVShowResponse(page));
 
         // Add source 1
         mergedData.addSource(getLocalTVShowResponse(), new Observer<List<TvShow>>() {
@@ -125,13 +96,11 @@ public class TVShowRepository {
             public void onChanged(@Nullable List<TvShow> tvShowResponseList) {
                 Log.d(TAG, "got from Room db, setting to merger");
                 mergedData.setValue(tvShowResponseList);
-                Log.d("data", tvShowResponseList.toString());
             }
         });
 
-
         // Add source 2
-        mergedData.addSource(getServerTVShowResponse(), new Observer<Resource<ArrayList<TvShow>>>() {
+        mergedData.addSource(getServerTVShowResponse(page), new Observer<Resource<ArrayList<TvShow>>>() {
             @Override
             public void onChanged(@Nullable Resource<ArrayList<TvShow>> arrayListResource) {
                 Log.d(TAG, arrayListResource.message);
@@ -172,4 +141,33 @@ public class TVShowRepository {
         return mAllTVShow;
     }
 
+    public void removeAllShows() {
+        mTVShowDao.removeAll();
+    }
+
+
+    // Saving Data Fetched From Api To Shared Preference
+    /*@WorkerThread
+    public static void saveTVShowResponse(@NonNull ArrayList<TVShowResponse> tvShowResponseList) {
+
+        Type type = new TypeToken<ArrayList<TVShowResponse>>(){}.getType();
+        SharedPrefUtil.saveStringToPreferences(SharedPrefConstants.TVSHOW_RESPONSE, GsonHelper.getInstance().toJson(tvShowResponseList, type));
+        Log.d(TAG, "Saving Tv Show response to db");
+    }*/
+
+    // Getting Local Tv Show Data From Shared Preference
+   /* public LiveData<ArrayList<TVShowResponse>> getLocalTVShowResponse(){
+        Type type = new TypeToken<ArrayList<TVShowResponse>>(){}.getType();
+        String json = SharedPrefUtil.getStringFromPreferences(SharedPrefConstants.TVSHOW_RESPONSE);
+        ArrayList<TVShowResponse> tvShowResponse;
+        MutableLiveData<ArrayList<TVShowResponse>> tvShowResponseLD = new MutableLiveData<>();
+        if(json != null){
+            tvShowResponse = GsonHelper.getInstance().fromJson(json,type);
+            tvShowResponseLD.setValue(tvShowResponse);
+        }
+`
+        Log.d(TAG,"Fetching Response From TVShow Local Database");
+
+        return tvShowResponseLD;
+    }*/
 }

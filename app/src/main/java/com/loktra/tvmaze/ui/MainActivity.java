@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -30,6 +31,7 @@ import com.loktra.tvmaze.databinding.ActivityMainBinding;
 import com.loktra.tvmaze.repository.api.Resource;
 import com.loktra.tvmaze.repository.models.TvShow;
 import com.loktra.tvmaze.utils.GridSpacingItemDecoration;
+import com.loktra.tvmaze.utils.PaginationScrollListener;
 import com.loktra.tvmaze.viewmodel.ShowViewModel;
 
 import java.util.ArrayList;
@@ -44,13 +46,20 @@ public class MainActivity extends BaseActivity implements ShowsAdapterListener, 
     private ActivityMainBinding binding;
     private ShowViewModel viewModel;
 
+    private static final int PAGE_START = 0;
+    private static final int TOTAL_PAGES = 154;
+    private static int CURRENT_PAGE = PAGE_START;
+
+    private boolean isLoading = false;
+    private boolean isLastPage = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         initBinding();
         initRecyclerView();
-        loadLocalAndMakeApiCall();
+        loadLocalAndMakeApiCall(PAGE_START);
     }
 
     //Instantiated Data Binding and View Model
@@ -75,38 +84,102 @@ public class MainActivity extends BaseActivity implements ShowsAdapterListener, 
      */
     private void initRecyclerView() {
         recyclerView = binding.content.recyclerView;
+        GridLayoutManager layoutManager;
+
+        //LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+            layoutManager = new GridLayoutManager(this, 2);
+
+            recyclerView.setLayoutManager(layoutManager);
+
             recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
         } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+
+            layoutManager = new GridLayoutManager(this, 3);
+
+            recyclerView.setLayoutManager(layoutManager);
 
             recyclerView.addItemDecoration(new GridSpacingItemDecoration(3, dpToPx(10), true));
         }
+
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                switch (mAdapter.getItemViewType(position)) {
+
+                    case TvShowAdapter.TVSHOW:
+                        return 1;
+
+                    case TvShowAdapter.LOADING:
+                        return 2;
+
+                    case TvShowAdapter.INFO:
+                        return 2;
+
+                    default:
+                        return 1;
+                }
+            }
+        });
 
         //recyclerView.setHasFixedSize(true); // why?? infinite scroll // tv api fixed that is why it is working
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setNestedScrollingEnabled(false);
         mAdapter = new TvShowAdapter(this);
         recyclerView.setAdapter(mAdapter);
+
+        recyclerView.addOnScrollListener(new PaginationScrollListener(layoutManager) {
+            @Override
+            protected void loadMoreItems() {
+                isLoading = true;
+                CURRENT_PAGE += 1;
+
+                //loadLocalAndMakeApiCall(CURRENT_PAGE);
+                loadNextPage(CURRENT_PAGE);
+            }
+
+            @Override
+            public int getTotalPageCount() {
+                return TOTAL_PAGES;
+            }
+
+            @Override
+            public boolean isLastPage() {
+                return isLastPage;
+            }
+
+            @Override
+            public boolean isLoading() {
+                return isLoading;
+            }
+        });
     } // End of initRecyclerView()
 
-    //Accessing Local Data And Making Api Call For Updated Data
-    private void loadLocalAndMakeApiCall() {
+    /**
+     * Accessing Local Data And Making Api Call For Updated Data
+     */
+    private void loadLocalAndMakeApiCall(final int page) {
         // Update the list when the data changes
 
         showProgressbar();
 
         if (viewModel != null)
-            viewModel.fetch().observe(this, new Observer<List<TvShow>>() {
+            viewModel.fetch(page).observe(this, new Observer<List<TvShow>>() {
                 @Override
                 public void onChanged(@Nullable List<TvShow> tvShows) {
                     if (tvShows != null) {
                         Log.d("Init main with list : ", tvShows.toString());
+
+                        /*if (page == 0)
+                            mAdapter.setTvshowList(tvShows);
+                        else*/
                         mAdapter.setTvshowList(tvShows);
 
                         hideProgressbar();
+
+                        if (CURRENT_PAGE <= TOTAL_PAGES) mAdapter.addLoadingFooter();
+                        else isLastPage = true;
 
                     } else {
                         Log.e(TAG, "Null reponse");
@@ -116,11 +189,48 @@ public class MainActivity extends BaseActivity implements ShowsAdapterListener, 
 
     }// End of observeViewModel()
 
+    private void loadNextPage(final int page) {
+        mAdapter.addLoadingFooter();
+
+        if (viewModel != null)
+
+            viewModel.fetchFromApi(page).observe(this, new Observer<Resource<ArrayList<TvShow>>>() {
+                @Override
+                public void onChanged(@Nullable Resource<ArrayList<TvShow>> arrayListResource) {
+
+                    switch (arrayListResource.status) {
+                        case SUCCESS:
+
+                            if (arrayListResource.data != null) {
+
+                                mAdapter.addTvshowList(arrayListResource.data);
+
+                                mAdapter.removeLoadingFooter();
+                                isLoading = false;
+
+                                if (CURRENT_PAGE <= TOTAL_PAGES) mAdapter.addLoadingFooter();
+                                else isLastPage = true;
+
+                            } else {
+                                Log.e(TAG, "Null reponse");
+                            }
+
+                            break;
+                    }
+                }
+            });
+    }
+
     @Override
     public ProgressBar getProgressBar() {
         return binding.mainProgressbar;
     }
 
+    /**
+     * Tv-Show item click
+     *
+     * @param show
+     */
     @Override
     public void onTvShowClick(TvShow show) {
         Toast.makeText(getApplicationContext(), "Show clicked! " + show.getName(), Toast.LENGTH_SHORT).show();
@@ -183,9 +293,25 @@ public class MainActivity extends BaseActivity implements ShowsAdapterListener, 
     }// End of loadSearchedShowsFromRoom()
 
 
+    /**
+     * Rating filter from 9 and above
+     */
     private void loadFilteredShow() {
+
+        float minRating = 8;
+        float maxRating = 10;
+
+        mAdapter.addInfoHeader(minRating);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mAdapter.removeInfoHeader();
+            }
+        }, 3000);
+
         if (viewModel != null) {
-            viewModel.filter(9f, 10f).observe(this, new Observer<List<TvShow>>() {
+            viewModel.filter(minRating, maxRating).observe(this, new Observer<List<TvShow>>() {
                 @Override
                 public void onChanged(@Nullable List<TvShow> tvShows) {
                     if (tvShows != null) {
@@ -198,12 +324,15 @@ public class MainActivity extends BaseActivity implements ShowsAdapterListener, 
         }
     }
 
+    /**
+     * Swipe to refresh
+     */
     @Override
     public void onRefresh() {
         Log.d(TAG, "onRefresh called");
 
         if (viewModel != null)
-            viewModel.fetchFromApi().observe(this, new Observer<Resource<ArrayList<TvShow>>>() {
+            viewModel.fetchFromApi(PAGE_START).observe(this, new Observer<Resource<ArrayList<TvShow>>>() {
                 @Override
                 public void onChanged(@Nullable Resource<ArrayList<TvShow>> tvShows) {
 
@@ -224,4 +353,5 @@ public class MainActivity extends BaseActivity implements ShowsAdapterListener, 
                 }
             });
     }
+
 } // End of MainActivity

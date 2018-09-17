@@ -43,6 +43,8 @@ public class TvShow {
     @Expose
     public Image image;
 
+    public TvShow() {
+    }
 
     public TvShow(String name, Rating rating, Image image) {
         this.name = name;
