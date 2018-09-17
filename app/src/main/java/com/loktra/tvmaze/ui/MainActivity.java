@@ -45,6 +45,7 @@ public class MainActivity extends BaseActivity implements ShowsAdapterListener, 
     private TvShowAdapter mAdapter;
     private ActivityMainBinding binding;
     private ShowViewModel viewModel;
+    private GridLayoutManager layoutManager;
 
     private static final int PAGE_START = 0;
     private static final int TOTAL_PAGES = 154;
@@ -84,9 +85,6 @@ public class MainActivity extends BaseActivity implements ShowsAdapterListener, 
      */
     private void initRecyclerView() {
         recyclerView = binding.content.recyclerView;
-        GridLayoutManager layoutManager;
-
-        //LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             layoutManager = new GridLayoutManager(this, 2);
@@ -129,7 +127,7 @@ public class MainActivity extends BaseActivity implements ShowsAdapterListener, 
         mAdapter = new TvShowAdapter(this);
         recyclerView.setAdapter(mAdapter);
 
-        recyclerView.addOnScrollListener(new PaginationScrollListener(layoutManager) {
+        recyclerView.addOnScrollListener(new PaginationScrollListener(binding, layoutManager) {
             @Override
             protected void loadMoreItems() {
                 isLoading = true;
@@ -300,6 +298,8 @@ public class MainActivity extends BaseActivity implements ShowsAdapterListener, 
 
         float minRating = 8;
         float maxRating = 10;
+
+        layoutManager.scrollToPositionWithOffset(0, 0);
 
         mAdapter.addInfoHeader(minRating);
 

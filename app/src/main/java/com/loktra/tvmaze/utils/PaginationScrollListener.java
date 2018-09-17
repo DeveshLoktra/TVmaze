@@ -3,22 +3,20 @@ package com.loktra.tvmaze.utils;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+
+import com.loktra.tvmaze.databinding.ActivityMainBinding;
 
 public abstract class PaginationScrollListener extends RecyclerView.OnScrollListener {
 
     RecyclerView.LayoutManager layoutManager;
-
-    /**
-     * @param linearLayoutManager
-     */
-    public PaginationScrollListener(LinearLayoutManager linearLayoutManager) {
-        this.layoutManager = linearLayoutManager;
-    }
+    ActivityMainBinding binding;
 
     /**
      * @param gridLayoutManager
      */
-    public PaginationScrollListener(GridLayoutManager gridLayoutManager) {
+    public PaginationScrollListener(ActivityMainBinding binding, GridLayoutManager gridLayoutManager) {
+        this.binding = binding;
         this.layoutManager = gridLayoutManager;
     }
 
@@ -48,6 +46,16 @@ public abstract class PaginationScrollListener extends RecyclerView.OnScrollList
                 loadMoreItems();
             }
         }
+
+        /**
+         * Show and Hide Floating Action Button
+         */
+        if (dy > 0 && binding.filterFloatingActionButton.getVisibility() == View.VISIBLE) {
+            binding.filterFloatingActionButton.hide();
+        } else if (dy < 0 && binding.filterFloatingActionButton.getVisibility() != View.VISIBLE) {
+            binding.filterFloatingActionButton.show();
+        }
+
     }
 
     protected abstract void loadMoreItems();
